@@ -1,112 +1,166 @@
-//Lewis Brown/ joe leon
-//CST-361
-//9-28-19
-//This assignment was completed in collaboration with Joe Leon, and Lewis Brown.
-//We used source code from the following websites to complete this assignment:
-//WEBSITE 1 https://www.byteplusone.com/searching-twitter-with-java-twitter4j/
-//WEBSITE 2 http://twitter4j.org/en/code-examples.html#search
-
 package data;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ejb.Local;
-import javax.ejb.LocalBean;
-import javax.ejb.Stateless;
+import beans.TwitterItems;
+import beans.TwitterResponseData;
+import beans.TwitterResponseDatas;
 
-import twitter4j.Twitter;
-import twitter4j.TwitterFactory;
-import twitter4j.conf.Configuration;
-import twitter4j.conf.ConfigurationBuilder;
-import twitter4j.Query;
-import twitter4j.QueryResult;
-import twitter4j.Status;
-import twitter4j.TwitterException;
-
-
-@Stateless
-@Local(TwitterDataInterface.class)
-@LocalBean
 public class TwitterDTO implements TwitterDataInterface
 {
-		
-	//Consumer key
-	private static String ConsumerKey = "SIAEvT52QzRmK5EWLBHjgdlZ1";
-	private static String consumerSecret = "iwT6Wa0FMDRIoom1cxrNlkj0KXh4in5l4CNNMovoYmjzOnWuB6";
-		
-	//Access Token
-	private static String accessTokens = "1177406911743848449-g0zFjCSVO5v73CryK9yU92EEor6Lqq";
-	private static String accessSecret = "K2tnpFWyH8ORTd3pJGaCQgI7C97W0416lmvKO50sH09kt";
-		
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+
+	String url = "jdbc:mysql://localhost:3306/memesupreme";
+	String username = "root";
+	String password = "root";
 	
-	/**used to seach for specific tweets by using twitters explore feature
-	 *to search for specific tweets
-	 * 
-	 * @param String word, int limit
-	 * @return tweets
-	 */
-	public List wordSearch(String word, int limit)
-	{
-		List tweets = new ArrayList();
-			
+	public List<TwitterItems> findAll() {
+		// TODO Auto-generated method stub
+		Connection conn = null;
+		String url = "jdbc:mysql://localhost:3306/music";
+		String username = "root";
+		String password = "root";
+		
+		List<TwitterItems> items = new ArrayList<TwitterItems>();
 		try
 		{
-			// allows us to input the tokens and sends it to twitter for authentification
-			ConfigurationBuilder cb = new ConfigurationBuilder();
-			cb.setOAuthConsumerKey(ConsumerKey);
-			cb.setOAuthConsumerSecret(consumerSecret);
-			cb.setOAuthAccessToken(accessTokens);
-			cb.setOAuthAccessTokenSecret(accessSecret);
-			Configuration config = cb.build();
-				
-			TwitterFactory tf = new TwitterFactory(config);				
-				
-			Twitter twitter = tf.getInstance(); 
-				
-			//"word" inside the parameter is the word to search
-			Query query = new Query(word);
-			QueryResult qr = twitter.search(query);
-				
-			//18 is a test number.
-			//sets the number of tweets
-			query.setCount(limit);
+			conn = DriverManager.getConnection(url, username, password);
 			
-			
-			//test to see if we have the correct keys used for debug
-			System.out.println("key: " + twitter.getConfiguration().getOAuthConsumerKey());
-			System.out.println("secret key: " + twitter.getConfiguration().getOAuthConsumerSecret());
-			System.out.println("Token: " + twitter.getConfiguration().getOAuthAccessToken());
-			System.out.println("Token secret: " + twitter.getConfiguration().getOAuthAccessTokenSecret());
-				
-			System.out.println("Search results for: " + word);
-			//adds the results from the searched word to the list
-			for(Status status: qr.getTweets())
+			String sql1 = "SELECT * FROM TWITTER";
+			Statement stmt1 = conn.createStatement();
+			ResultSet rs1 = stmt1.executeQuery(sql1);
+			while (rs1.next()) 
 			{
-				tweets.add(status.getText());
+				TwitterItems ti = new TwitterItems(rs1.getString("TWEET"), rs1.getString("SCREEN_NAME"), rs1.getInt("RT_COUNT"), rs1.getInt("Likes"), rs1.getString("LANG"));
+				items.add(ti);
 			}
 		}
-		catch(TwitterException e)
+		catch (SQLException e)
 		{
 			e.printStackTrace();
+			//throw new DatabaseException(e);
 		}
-		return tweets;
+		finally
+		{
+			  if(conn != null)
+	            {
+	                try
+	                {
+	                    conn.close();
+	                }
+	                catch (SQLException e)
+	                {
+	                    e.printStackTrace();
+	                    //throw new DatabaseException(e);
+	                }
+	            }
+	        }
+		return items;
 	}
+	
+	
+	public TwitterItems findBy(TwitterItems ti) {
+		// TODO Auto-generated method stub
+		Connection conn = null;
+		String url = "jdbc:mysql://localhost:3306/memesupreme";
+		String username = "root";
+		String password = "root";
+		try
+		{
+			conn = DriverManager.getConnection(url, username, password);
+			
+			String sql1 = String.format("SELECT * FROM TWITTER WHERE TWEET='%s' AND SCREEN_NAME='%s' AND RT_COUNT=%d AND HASH_TAGS='%s' AND LANG='%s' AND LIKES=%d",
+										ti.getTweet(),
+										ti.getScreenName(),
+										ti.getRetweetCount(),
+										ti.getHashtags(),
+										ti.getLanguage(),
+										ti.getLikes());
+			Statement stmt1 = conn.createStatement();
+			ResultSet rs1 = stmt1.executeQuery(sql1);
+			if(!rs1.next())
+			{
+				rs1.close();
+				stmt1.close();
+				return null;
+			}
+			
+			ti.setTweet(rs1.getString("TWEET"));
+			ti.setScreenName(rs1.getString("SCREEN_NAME"));
+			ti.setRetweetCount(rs1.getInt("RT_COUNT"));
+			ti.setHashtags(rs1.getString("HASH_TAGS"));
+			ti.setLanguage(rs1.getString("LANG"));
+			ti.setLikes(rs1.getInt("LIKES"));
+			
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+			//throw new DatabaseException(e);
+		}
+		finally
+		{
+			  if(conn != null)
+	            {
+	                try
+	                {
+	                    conn.close();
+	                }
+	                catch (SQLException e)
+	                {
+	                    e.printStackTrace();
+	                    //throw new DatabaseException(e);
+	                }
+	            }
+		}
+		return ti;
+	}
+
+	public boolean create(TwitterResponseData data) {
+		Connection conn = null;
+		try
+		{
+		conn = DriverManager.getConnection(url, username, password);
+		String sql1 = String.format("INSERT INTO TWITTER(TWEET, SCREEN_NAME, RT_COUNT, LIKES, LANG) VALUES('%s', '%s', %d, %d, '%s')",
+				data.getData().getScreenName(),
+				data.getData().getTweet(),
+				data.getData().getRetweetCount(),
+				data.getData().getLikes(),
+				data.getData().getLanguage());
+				
+		System.out.println(sql1);
+		Statement stmt1 = conn.createStatement();
+		stmt1.executeUpdate(sql1);
 		
+		stmt1.close();
+		}
+		//Everything below this is copied from FindBYID();
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+			//throw new DatabaseException(e);
+		}
+		finally
+		{
+			if(conn != null)
+			{
+				try
+				{
+					conn.close();
+				}
+				catch (SQLException e)
+				{
+					e.printStackTrace();
+					//throw new DatabaseException(e);
+				}
+			}
+		}
+		return true;
+	}
+	
 }
-		
-		/*
-		//code that doesnt work but used as a frame to build off on
-		ConfigurationBuilder cb = new ConfigurationBuilder();
-	    cb.setDebugEnabled(true).setOAuthConsumerKey("SIAEvT52QzRmK5EWLBHjgdlZ1")
-	    .setOAuthConsumerSecret("iwT6Wa0FMDRIoom1cxrNlkj0KXh4in5l4CNNMovoYmjzOnWuB6")
-	    .setOAuthAccessToken("1177406911743848449-g0zFjCSVO5v73CryK9yU92EEor6Lqq")
-	    .setOAuthAccessTokenSecret("K2tnpFWyH8ORTd3pJGaCQgI7C97W0416lmvKO50sH09kt");
-	    
-	    TwitterFactory tf = new TwitterFactory(cb.build());
-	    twitter4j.Twitter twitter=tf.getInstance();
-	    
-	    */
-
-
