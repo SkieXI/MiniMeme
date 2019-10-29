@@ -1,11 +1,11 @@
-//Lewis Brown/ joe leon
-//CST-361
-//9-28-19
-//This assignment was completed in collaboration with Joe Leon, and Lewis Brown.
-//We used source code from the following websites to complete this assignment:
-//WEBSITE 1 https://www.byteplusone.com/searching-twitter-with-java-twitter4j/
-//WEBSITE 2 http://twitter4j.org/en/code-examples.html#search
-
+/**
+CST-361
+9-28-19
+This assignment was completed in collaboration with Joe Leon, and Lewis Brown.
+We used source code from the following websites to complete this assignment:
+WEBSITE 1 https://www.byteplusone.com/searching-twitter-with-java-twitter4j/
+WEBSITE 2 http://twitter4j.org/en/code-examples.html#search
+**/
 package data;
 
 import java.util.ArrayList;
@@ -44,11 +44,10 @@ public class TwitterConnection
 	
 	//used to seach for specific tweets by using twitters explore feature
 	//to search for specific tweets
-	public List wordSearch(String word, int limit)
+	public TwitterItems wordSearch(String word, int limit)
 	{
-		List tweets = new ArrayList();
-		TwitterItems items = new TwitterItems();
-		List<TwitterItems> itemList = new ArrayList<TwitterItems>();
+		//List tweets = new ArrayList();
+		TwitterItems itemList = new TwitterItems(); //ArrayList<TwitterItems>();
 			
 		try
 		{
@@ -84,23 +83,29 @@ public class TwitterConnection
 			
             for (Status tweet : tw ) 
             {
-            	/*
+            	//Setting up a local variable for each aspect of the tweet.
+//            	String for the Name
+//            	String for the body
+//            	Int for the RetweetCount
+//            	int for the number of likes.
+//            	and a String for which language the user made their tweet in.
+            	
+            	
             	String sname= tweet.getUser().getScreenName();
             	String body = tweet.getText();
             	int retweetCount = tweet.getRetweetCount();
             	int favorites = tweet.getFavoriteCount();
             	String lang = tweet.getLang();
             	
-            	//Saving it to items
+            	//Saving it to itemList.
             	
-            	items.setScreenName(sname);
-            	items.setTweet(body);
-            	items.setRetweetCount(retweetCount);
-            	items.setLikes(favorites);
-            	items.setLanguage(lang);
+            	itemList.setScreenName(sname);
+            	itemList.setTweet(body);
+            	itemList.setRetweetCount(retweetCount);
+            	itemList.setLikes(favorites);
+            	itemList.setLanguage(lang);
             	
-            	*/
-            	itemList.add(new TwitterItems(tweet.getUser().getScreenName(), tweet.getText(), tweet.getRetweetCount(), tweet.getFavoriteCount(), tweet.getLang()));
+            	//itemList.add(new TwitterItems(tweet.getUser().getScreenName(), tweet.getText(), tweet.getRetweetCount(), tweet.getFavoriteCount(), tweet.getLang()));
                 System.out.println("Name: @" + tweet.getUser().getScreenName() + "| Text: " + tweet.getText() + "|Retweets: " + tweet.getRetweetCount() + "|Favorites: " + tweet.getFavoriteCount() + "|Language: " + tweet.getLang());
             }
 		}

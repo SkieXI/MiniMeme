@@ -1,3 +1,9 @@
+/**CST-361
+ * 10-21-19
+ * This assignment was completed in collaboration with Joe Leon, and Lewis Brown.
+ * This class contains all the different components of a Tweet.
+ */
+
 package beans;
 
 import javax.faces.bean.ManagedBean;
@@ -6,8 +12,16 @@ import javax.faces.bean.ViewScoped;
 
 @ManagedBean
 @ViewScoped
-public class TwitterItems {
-	
+public class TwitterItems 
+{
+	//A tweet is composed of the following:
+//	-A string of Screenname;
+//	-A string for the body of text.
+//	-A int of retweetCount.
+//	-A String for hashtags. Though this is going to go unused.
+//	-A int of likes.
+//	-A String for which language the tweet was made it.
+//	
 	
 	private String tweet;
 	private String screenName;
@@ -16,6 +30,8 @@ public class TwitterItems {
 	private String language;
 	private int likes;
 	
+	
+	//Non-Defaut Constructor.
 	public TwitterItems(String tweet, String screenName, int retweetCount, int likes, String language) {
 
 		this.tweet = tweet;
@@ -25,17 +41,18 @@ public class TwitterItems {
 		this.language = language;
 		this.likes = likes;
 	}
-	
+	//Default Constructor 
 	public TwitterItems()
 	{
 		tweet = "";
 		screenName = "";
 		retweetCount = 0;
-		//hashtags = "";
+		hashtags = "";
 		language = "";
 		likes = 0;
 	}
 
+	//Getters and Setters.
 	public int getLikes() {
 		return likes;
 	}
@@ -83,6 +100,8 @@ public class TwitterItems {
 	public void setLanguage(String language) {
 		this.language = language;
 	}
+	
+	//This thing is interesting since its combining all of the previous variables into something that resembles JSON.
 	public String toString() {
 		////return "{pressure: "+this.pressure+" tempC: "+this.tempC+ " tempF: "+this.tempF+" humidity: "+this.humidity+"}";
 		return "{screenname: "+this.screenName + " tweet: " + this.tweet + " retweetCount: " + this.retweetCount + " likes: " + this.likes + " hashtags: " + this.hashtags + " language: " + this.language + "}";
