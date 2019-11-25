@@ -53,8 +53,8 @@ public class TwitterREST
 	@Produces(MediaType.APPLICATION_JSON)
 	public BatchFactoryInterface inboundData(@PathParam("word") String word, @PathParam("count") int count)
 	{
-		Timer timer = new Timer();
-		TimerTask TT = new TimerScheduleFixedRateDelay();
+		//Timer timer = new Timer();
+		//TimerTask TT = new TimerScheduleFixedRateDelay();
 		
 		BatchItems bi = new BatchItems();
 		try
