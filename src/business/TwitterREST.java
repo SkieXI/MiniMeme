@@ -1,27 +1,26 @@
-/**CST-361
- * 10-24-19
- * This assignment was completed in collaboration with Joe Leon, and Lewis Brown.
- * We used source code from the inclass activity as a template.
- * with one another.
- */
 package business;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import javax.ejb.EJB;
-import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import beans.TwitterResponseData;
-import beans.TwitterItems;
-import data.TwitterDTO;
-import data.TwitterDataInterface;
+import beans.BatchDTO;
+import beans.BatchFactoryInterface;
+import beans.BatchItems;
+import beans.Search;
+import util.DataFactory;
 
+import javax.ejb.EJB;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.PathParam;
 
 @RequestScoped
 @Path("/tweets")
@@ -29,33 +28,49 @@ import data.TwitterDataInterface;
 @Consumes({ "application/xml", "application/json" })
 public class TwitterREST 
 {
-	//Create a new instance of TwitterDTO.
-	//TwitterDTO DTO = new TwitterDTO();
 	
-	//Create a new instance of the TwitterManager.
-	TwitterManager TMG = new TwitterManager();
+	@Inject
+	TwitterInterface<BatchItems> TI;
 	
+	DataFactory dFactory = new DataFactory();
 	
-	/**This calls all the information from the database and transfers it off in a list of objects called List<TwitterItems> items.
-	 * 
-	 * @return
-	 */
 	@GET
-	@Path("/getalldata")
+	@Path("/outboundData")
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<TwitterItems> getAllData() 
+	public BatchFactoryInterface outboundData(Search se)
 	{
-		//Creates a new instance of TwitterResponseData.
-		TwitterResponseData TRD = new TwitterResponseData();
-		
-		//Calls the something.
-		TRD = (TwitterResponseData) TMG.getAllData();
-		//Creates a list of TwitterItems.
-		//TwitterItems items = new TwitterItems();
-		List<TwitterItems> items = TRD.getItems();
 		System.out.println("REST TEST");
-		System.out.println(items);
-		return items;
-		//return null;
+		BatchItems bi = TI.wordSearch(se.getSearch(), se.getCount());
+		BatchFactoryInterface BFI = dFactory.getBatchInterface("DATAFOUND");
+		BFI.setItems(bi);
+		return BFI;
+	}	
+	
+	@GET
+	@Path("/inboundData/{word}/{count}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public BatchFactoryInterface inboundData(@PathParam("word") String word, @PathParam("count") int count)
+	{
+		Timer timer = new Timer();
+		TimerTask TT = new TimerScheduleFixedRateDelay();
+		
+		BatchItems bi = new BatchItems();
+		try
+		{
+		System.out.println("REST TEST");
+		
+		
+		bi = TI.wordSearch(word, count);
+		BatchFactoryInterface BFI = dFactory.getBatchInterface("DATAFOUND");
+		BFI.setItems(bi);
+		return BFI;
+		}
+		catch (Exception e)
+		{
+			BatchFactoryInterface BFI = dFactory.getBatchInterface("NODATAFOUND");
+			return BFI;
+		}
 	}
 }
