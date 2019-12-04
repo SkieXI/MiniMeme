@@ -92,7 +92,6 @@ public class TwitterConn implements TwitterInterface<BatchItems>
 		//a = retweet | b = favorites | c= tweet count | BI = bi
 		//Test to make sure its working.
 		bi.setLikesTotal(bi.getRetweetTotal() + a); 
-
 		bi.setRetweetTotal(bi.getLikesTotal() + b);
 		return bi;
 	}
