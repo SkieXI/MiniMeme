@@ -3,10 +3,10 @@ package business;
 import java.util.List;
 
 import beans.BatchItems;
+import beans.TwitterItems;
 
 public interface TwitterInterface <T>
 {
-	public List<T> dataOutput();
-	public BatchItems wordSearch(String a, int b);
-	public T timer(String a, int b);
+	public T wordSearch(String a);
+	List<TwitterItems> dataOutput(String a);
 }

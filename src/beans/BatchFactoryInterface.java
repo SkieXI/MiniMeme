@@ -1,10 +1,10 @@
 package beans;
 
-public interface BatchFactoryInterface 
+public interface BatchFactoryInterface<T>
 {
-	public BatchItems getItems();
+	public T getItems();
 
-	public void setItems(BatchItems items);
+	public void setItems(T i);
 	
 	public int getStatus();
 
